@@ -27,6 +27,7 @@
     "@onto-med/top-api": "file:/app/top-api.tgz",
     "@quasar/extras": "^1.16.8",
     "@types/papaparse": "^5.3.14",
+    "ag-grid-vue3": "^31.0.3",
     "core-js": "^3.33.2",
     "papaparse": "^5.4.1",
     "pinia": "^2.1.7",
