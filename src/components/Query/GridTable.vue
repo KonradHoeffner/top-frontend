@@ -80,6 +80,9 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable vue/no-unused-components*/
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
 import { storeToRefs } from 'pinia'
 import { exportFile, QTableProps } from 'quasar'
@@ -91,6 +94,12 @@ import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from '
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 
+//import { ref } from 'vue';
+import "ag-grid-community/styles/ag-grid.css"; // Core CSS
+import "ag-grid-community/styles/ag-theme-quartz.css"; // Theme
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import { AgGridVue } from "ag-grid-vue3"; // Vue Grid Logic
+
 export default defineComponent({
   props: {
     page: {
@@ -100,8 +109,25 @@ export default defineComponent({
     loading: Boolean,
     isConceptQuery: Boolean
   },
+  components: {AgGridVue},
   emits: ['delete', 'prefill', 'request'],
   setup(props, { emit }) {
+
+  const rowData = ref([
+    { make: "Tesla", model: "Model Y", price: 64950, electric: true },
+    { make: "Ford", model: "F-Series", price: 33850, electric: false },
+    { make: "Toyota", model: "Corolla", price: 29600, electric: false },
+  ]);
+
+  // Column Definitions: Defines & controls grid columns.
+  const colDefs = ref([
+    { field: "make" },
+    { field: "model" },
+    { field: "price" },
+    { field: "electric" }
+  ]);
+
+
     const { t } = useI18n()
     const queryApi = inject(QueryApiKey)
     const entityStore = useEntity()
