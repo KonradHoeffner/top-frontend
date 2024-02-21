@@ -2,7 +2,12 @@
   <q-dialog ref="dialogRef" @hide="onDialogHide" persistent full-width full-height>
     <q-card class="q-dialog-plugin">
       <q-card-section>
-        <ag-grid-vue :rowData="rowData" :columnDefs="colDefs" style="height: 500px" class="ag-theme-quartz">
+        <ag-grid-vue
+          :rowData="rowData"
+          :columnDefs="colDefs"
+          style="width: 100%; height: 100vh"
+          class="ag-theme-quartz"
+        >
         </ag-grid-vue>
       </q-card-section>
       <q-separator />
@@ -23,25 +28,34 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable vue/no-unused-components*/
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-argument*/
+/* eslint-disable @typescript-eslint/no-unsafe-member-access*/
 import { useDialogPluginComponent } from 'quasar'
 import 'ag-grid-community/styles/ag-grid.css' // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css' // Theme
 import { AgGridVue } from 'ag-grid-vue3' // Vue Grid Logic
 import { ref } from 'vue'
+import Papa from 'papaparse'
 
 const props = defineProps({
   csv: String
   // ...your custom props
 })
 
-const rowData = ref([
+const rows = Papa.parse(props.csv, { header: true }).data
+const keys = Object.keys(rows[0])
+const fields = keys.map((key) => ({ field: key }))
+//console.log(fields)
+const colDefs = ref(fields)
+//const colDefs = ref([{ field: 'make' }, { field: 'model' }, { field: 'price' }, { field: 'electric' }])
+
+const rowData = ref(rows)
+
+/*const rowData = ref([
   { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
   { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
   { make: 'Toyota', model: 'Corolla', price: 29600, electric: false }
-])
-
-// Column Definitions: Defines & controls grid columns.
-const colDefs = ref([{ field: 'make' }, { field: 'model' }, { field: 'price' }, { field: 'electric' }])
+])*/
 
 defineEmits([
   // REQUIRED; need to specify some events that your

@@ -254,7 +254,7 @@ export default defineComponent({
         const subjectEntry = entries[1] // first entry is metadata.csv, second entry is data_subjects.csv
         const subjectWriter = new zip.TextWriter()
         const subjectCsv = await subjectEntry.getData!(subjectWriter)
-        console.log(subjectCsv)
+        //console.log(subjectCsv)
 
         $q.dialog({
           component: GridDialog,
