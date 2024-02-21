@@ -30,6 +30,7 @@ import { AgGridVue } from 'ag-grid-vue3' // Vue Grid Logic
 import { ref } from 'vue'
 
 const props = defineProps({
+  csv: String
   // ...your custom props
 })
 

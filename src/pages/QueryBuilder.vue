@@ -71,14 +71,6 @@
           @prefill="prefillQuery"
           @request="loadQueryPage($event)"
         />
-        <grid-table
-          class="fit"
-          :page="queryPage"
-          :is-concept-query="isConceptQuery"
-          @delete="deleteQuery"
-          @prefill="prefillQuery"
-          @request="loadQueryPage($event)"
-        />
       </q-scroll-area>
 
       <div
@@ -121,7 +113,6 @@ import { v4 as uuidv4 } from 'uuid'
 import { QueryApiKey } from 'src/boot/axios'
 import { QScrollArea, useQuasar } from 'quasar'
 import QueryResultsTable from 'src/components/Query/QueryResultsTable.vue'
-import GridTable from 'src/components/Query/GridTable.vue'
 import RepositorySelectField from 'src/components/Repository/RepositorySelectField.vue'
 import Dialog from 'src/components/Dialog.vue'
 import ConceptQueryForm from 'src/components/Query/ConceptQueryForm.vue'

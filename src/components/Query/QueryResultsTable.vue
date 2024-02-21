@@ -100,6 +100,8 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable vue/no-unused-components*/
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call*/
+/* eslint-disable @typescript-eslint/no-unsafe-member-access*/
 import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
 import GridDialog from './GridDialog.vue'
 import { storeToRefs } from 'pinia'
@@ -111,6 +113,7 @@ import { useEntity } from 'src/pinia/entity'
 import { computed, defineComponent, inject, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
+import * as zip from '@zip.js/zip.js'
 
 export default defineComponent({
   props: {
@@ -241,17 +244,24 @@ export default defineComponent({
 
       async showGrid(query: Query) {
         if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return
-        const blob = await queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, {
-          responseType: 'blob'
-        })
-        //const contents = unzip(); // todo: find unzip library
-        //const subjects = contents["data_subjects.csv"];
+        const zipBlob = (
+          await queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, {
+            responseType: 'blob'
+          })
+        ).data as Blob
+        const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
+        const entries = await zipReader.getEntries()
+        const subjectEntry = entries[1] // first entry is metadata.csv, second entry is data_subjects.csv
+        const subjectWriter = new zip.TextWriter()
+        const subjectCsv = await subjectEntry.getData!(subjectWriter)
+        console.log(subjectCsv)
+
         $q.dialog({
           component: GridDialog,
 
           // props forwarded to your custom component
           componentProps: {
-            text: 'something'
+            csv: subjectCsv
             // ...more..props...
           }
         })
