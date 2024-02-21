@@ -18,7 +18,13 @@
             <slot name="row-cells" :row="props.row">
               <q-td auto-width>
                 <q-spinner v-if="isRunning(props.row)" :title="t('running')" size="sm" />
-                <q-icon v-else-if="isFinished(props.row)" :title="t('finished')" name="done" size="sm" color="positive" />
+                <q-icon
+                  v-else-if="isFinished(props.row)"
+                  :title="t('finished')"
+                  name="done"
+                  size="sm"
+                  color="positive"
+                />
                 <q-icon v-else-if="isFailed(props.row)" :title="t('failed')" name="bolt" size="sm" color="negative" />
                 <q-icon v-else :title="t('queued')" name="pause" size="sm" color="grey" />
               </q-td>
@@ -36,7 +42,13 @@
                       {{ t('downloadDataSet') }}
                     </q-item-section>
                   </q-item>
-                  <q-item v-if="isConceptQuery" v-close-popup clickable :disable="!isFinished(props.row)" @click="routeToDocumentView(props.row)">
+                  <q-item
+                    v-if="isConceptQuery"
+                    v-close-popup
+                    clickable
+                    :disable="!isFinished(props.row)"
+                    @click="routeToDocumentView(props.row)"
+                  >
                     <q-item-section>
                       {{ t('showDocumentResults') }}
                     </q-item-section>
@@ -50,6 +62,11 @@
                   <q-item v-close-popup clickable @click="$emit('delete', props.row)">
                     <q-item-section>
                       {{ t('removeThing', { thing: t('queryResult') }) }}
+                    </q-item-section>
+                  </q-item>
+                  <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="showGrid(props.row)">
+                    <q-item-section>
+                      {{ t('downloadDataSet') }}
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -80,9 +97,13 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable vue/no-unused-components*/
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Query, QueryPage, QueryResult, QueryState } from '@onto-med/top-api'
+import GridDialog from './GridDialog.vue'
 import { storeToRefs } from 'pinia'
-import { exportFile, QTableProps } from 'quasar'
+import { exportFile, useQuasar, QTableProps } from 'quasar'
 import { QueryApiKey } from 'src/boot/axios'
 import { SearchTypesEnum } from 'src/config'
 import useNotify from 'src/mixins/useNotify'
@@ -111,20 +132,26 @@ export default defineComponent({
     const interval = ref<number>()
     const skippedQueries = ref<Set<string>>(new Set<string>())
     const router = useRouter()
+    const $q = useQuasar()
 
     const loadResult = async (query: Query) => {
-      if (props.loading || !queryApi || !organisationId.value || !repositoryId.value || getQueryResult(query)?.finishedAt)
-        return new Promise<void>(resolve => resolve())
-      return queryApi.getQueryById(organisationId.value, repositoryId.value, query.id)
-        .then(r => {
-          if (!r.data.result) return
-          const index = results.value.findIndex(result => result.id === query.id)
-          if (index !== -1) results.value.splice(index, 1)
-          results.value.push(r.data.result)
-        })
+      if (
+        props.loading ||
+        !queryApi ||
+        !organisationId.value ||
+        !repositoryId.value ||
+        getQueryResult(query)?.finishedAt
+      )
+        return new Promise<void>((resolve) => resolve())
+      return queryApi.getQueryById(organisationId.value, repositoryId.value, query.id).then((r) => {
+        if (!r.data.result) return
+        const index = results.value.findIndex((result) => result.id === query.id)
+        if (index !== -1) results.value.splice(index, 1)
+        results.value.push(r.data.result)
+      })
     }
 
-    const getQueryResult = (query: Query) => results.value.find(r => r.id === query.id)
+    const getQueryResult = (query: Query) => results.value.find((r) => r.id === query.id)
 
     const getState = (query: Query): QueryState => {
       const result = getQueryResult(query)
@@ -153,11 +180,10 @@ export default defineComponent({
       interval.value = window.setInterval(() => {
         props.page.content.map(async (query) => {
           if (getQueryResult(query)?.finishedAt || skippedQueries.value.has(query.id)) return
-          await loadResult(query)
-            .catch((e: Error) => {
-              skippedQueries.value.add(query.id)
-              renderError(e)
-            })
+          await loadResult(query).catch((e: Error) => {
+            skippedQueries.value.add(query.id)
+            renderError(e)
+          })
         })
       }, 5000)
     })
@@ -171,12 +197,15 @@ export default defineComponent({
       t,
 
       rows: computed(() => props.page.content),
-      cols: computed(() => [
-          { name: 'state' },
-          { name: 'name', field: 'name', label: t('name'), align: 'left' },
-          { name: 'result', field: 'result', label: t('result'), align: 'left' },
-          { name: 'elappsedTime', align: 'right' }
-      ] as QTableProps['columns']),
+      cols: computed(
+        () =>
+          [
+            { name: 'state' },
+            { name: 'name', field: 'name', label: t('name'), align: 'left' },
+            { name: 'result', field: 'result', label: t('result'), align: 'left' },
+            { name: 'elappsedTime', align: 'right' }
+          ] as QTableProps['columns']
+      ),
 
       isRunning(query: Query): boolean {
         return getState(query) === QueryState.Running
@@ -190,17 +219,14 @@ export default defineComponent({
         return getState(query) === QueryState.Failed
       },
 
-      getEllapsedTime(query: Query): string|undefined {
+      getEllapsedTime(query: Query): string | undefined {
         const result = getQueryResult(query)
         if (!result) return undefined
-        const finishedAt = result.finishedAt
-          ? new Date(result.finishedAt).getTime()
-          : new Date().getTime()
-        return new Date(finishedAt - new Date(result.createdAt).getTime())
-          .toISOString().slice(11, 19)
+        const finishedAt = result.finishedAt ? new Date(result.finishedAt).getTime() : new Date().getTime()
+        return new Date(finishedAt - new Date(result.createdAt).getTime()).toISOString().slice(11, 19)
       },
 
-      getResult(query: Query): number|string|undefined {
+      getResult(query: Query): number | string | undefined {
         const result = getQueryResult(query)
         if (!result) return undefined
         return result.message || result.count
@@ -208,11 +234,30 @@ export default defineComponent({
 
       async download(query: Query) {
         if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return
-        await queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
-          .then(r => exportFile(query.id + '.zip', r.data as Blob))
+        await queryApi
+          .downloadQueryResult(organisationId.value, repositoryId.value, query.id, { responseType: 'blob' })
+          .then((r) => exportFile(query.id + '.zip', r.data as Blob))
       },
 
-      onPageSelect (page: number) {
+      async showGrid(query: Query) {
+        if (!queryApi || !getQueryResult(query) || !organisationId.value || !repositoryId.value) return
+        const blob = await queryApi.downloadQueryResult(organisationId.value, repositoryId.value, query.id, {
+          responseType: 'blob'
+        })
+        //const contents = unzip(); // todo: find unzip library
+        //const subjects = contents["data_subjects.csv"];
+        $q.dialog({
+          component: GridDialog,
+
+          // props forwarded to your custom component
+          componentProps: {
+            text: 'something'
+            // ...more..props...
+          }
+        })
+      },
+
+      onPageSelect(page: number) {
         emit('request', page)
       }
     }
