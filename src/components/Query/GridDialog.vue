@@ -7,7 +7,7 @@
           :column-defs="colDefs"
           :default-col-def="defaultColDef"
           :column-types="columnTypes"
-          style="width: 100%; height: 95vh"
+          style="width: 100%; height: 90vh"
           class="ag-theme-quartz"
         >
         </ag-grid-vue>

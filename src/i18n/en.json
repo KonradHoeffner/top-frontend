@@ -522,6 +522,7 @@
   "frontend": "Frontend|Frontends",
   "backendUnavailable": "The backend server is currently not available. Please try again later.",
   "backend": "Backend|Backends",
+  "showGrid": "Show data table",
   "unavailable": "unavailable",
   "tryAgain": "Try again"
 }

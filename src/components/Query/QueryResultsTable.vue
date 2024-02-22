@@ -66,7 +66,7 @@
                   </q-item>
                   <q-item v-close-popup clickable :disable="!isFinished(props.row)" @click="showGrid(props.row)">
                     <q-item-section>
-                      {{ t('downloadDataSet') }}
+                      {{ t('showGrid') }}
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -97,8 +97,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable vue/no-unused-components*/
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-call*/
 /* eslint-disable @typescript-eslint/no-unsafe-member-access*/
