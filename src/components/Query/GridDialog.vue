@@ -1,12 +1,12 @@
 <template>
-  <q-dialog ref="dialogRef" @hide="onDialogHide" persistent full-width full-height>
+  <q-dialog ref="dialogRef" persistent full-width full-height @hide="onDialogHide">
     <q-card class="q-dialog-plugin">
       <q-card-section>
         <ag-grid-vue
           :row-data="rowData"
-          :columnDefs="colDefs"
-          :defaultColDef="defaultColDef"
-          :columnTypes="columnTypes"
+          :column-defs="colDefs"
+          :default-col-def="defaultColDef"
+          :column-types="columnTypes"
           style="width: 100%; height: 95vh"
           class="ag-theme-quartz"
         >
@@ -27,6 +27,9 @@
 </template>
 
 <script setup>
+/* eslint-disable @typescript-eslint/no-unsafe-assignment*/
+/* eslint-disable @typescript-eslint/no-unsafe-argument*/
+/* eslint-disable @typescript-eslint/no-unsafe-member-access*/
 import { useDialogPluginComponent } from 'quasar'
 import 'ag-grid-community/styles/ag-grid.css' // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css' // Theme
@@ -54,13 +57,15 @@ function colDef(fieldName: string) {
   return def
 }
 */
-const rows = Papa.parse(props.csv, { header: true, delimiter: ';' }).data as Array<string>
+const parseResult = Papa.parse(props.csv, { header: true, delimiter: ';' })
+const rows = parseResult.data
 const keys = Object.keys(rows[0])
 const fields = keys.map((key) => ({ field: key }))
 //console.log(fields)
 const colDefs = ref(fields)
 //const colDefs = ref([{ field: 'make' }, { field: 'model' }, { field: 'price' }, { field: 'electric' }])
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const rowData = ref(rows)
 
 const defaultColDef = {
