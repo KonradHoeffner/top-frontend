@@ -5,7 +5,9 @@
         <ag-grid-vue
           :rowData="rowData"
           :columnDefs="colDefs"
-          style="width: 100%; height: 100vh"
+          :defaultColDef="defaultColDef"
+          :columnTypes="columnTypes"
+          style="width: 100%; height: 95vh"
           class="ag-theme-quartz"
         >
         </ag-grid-vue>
@@ -42,7 +44,22 @@ const props = defineProps({
   // ...your custom props
 })
 
-const rows = Papa.parse(props.csv, { header: true }).data
+// this commit causes the build error
+//const colDef = (fieldName: string) => 5;
+
+/*
+function colDef(fieldName: string) {
+  const def = { field: fieldName }
+  if (fieldName == 'Id') {
+    def.type = 'idColumn'
+  }
+  if (fieldName.includes('(DATE)')) {
+    def.type = 'dateColumn'
+  }
+  return def
+}
+*/
+const rows = Papa.parse(props.csv, { header: true, delimiter: ';' }).data
 const keys = Object.keys(rows[0])
 const fields = keys.map((key) => ({ field: key }))
 //console.log(fields)
@@ -51,6 +68,18 @@ const colDefs = ref(fields)
 
 const rowData = ref(rows)
 
+const defaultColDef = {
+  editable: false,
+  sortable: true,
+  filter: 'agNumberColumnFilter'
+}
+const columnTypes = {
+  idColumn: { filter: 'agTextColumnFilter' },
+  dateColumn: {
+    filter: 'agDateColumnFilter',
+    cellDataType: 'dateString'
+  }
+}
 /*const rowData = ref([
   { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
   { make: 'Ford', model: 'F-Series', price: 33850, electric: false },

@@ -251,7 +251,7 @@ export default defineComponent({
         ).data as Blob
         const zipReader = new zip.ZipReader(new zip.BlobReader(zipBlob))
         const entries = await zipReader.getEntries()
-        const subjectEntry = entries[1] // first entry is metadata.csv, second entry is data_subjects.csv
+        const subjectEntry = entries[2] // 0 is actual metadata, 1 is metadata.csv, 2 is data_subjects.csv
         const subjectWriter = new zip.TextWriter()
         const subjectCsv = await subjectEntry.getData!(subjectWriter)
         //console.log(subjectCsv)
