@@ -3,7 +3,7 @@
     <q-card class="q-dialog-plugin">
       <q-card-section>
         <ag-grid-vue
-          :rowData="rowData"
+          :row-data="rowData"
           :columnDefs="colDefs"
           :defaultColDef="defaultColDef"
           :columnTypes="columnTypes"
@@ -27,11 +27,6 @@
 </template>
 
 <script setup>
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable vue/no-unused-components*/
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-argument*/
-/* eslint-disable @typescript-eslint/no-unsafe-member-access*/
 import { useDialogPluginComponent } from 'quasar'
 import 'ag-grid-community/styles/ag-grid.css' // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css' // Theme
@@ -59,7 +54,7 @@ function colDef(fieldName: string) {
   return def
 }
 */
-const rows = Papa.parse(props.csv, { header: true, delimiter: ';' }).data
+const rows = Papa.parse(props.csv, { header: true, delimiter: ';' }).data as Array<string>
 const keys = Object.keys(rows[0])
 const fields = keys.map((key) => ({ field: key }))
 //console.log(fields)
@@ -80,11 +75,6 @@ const columnTypes = {
     cellDataType: 'dateString'
   }
 }
-/*const rowData = ref([
-  { make: 'Tesla', model: 'Model Y', price: 64950, electric: true },
-  { make: 'Ford', model: 'F-Series', price: 33850, electric: false },
-  { make: 'Toyota', model: 'Corolla', price: 29600, electric: false }
-])*/
 
 defineEmits([
   // REQUIRED; need to specify some events that your
