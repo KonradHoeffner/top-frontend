@@ -3,7 +3,7 @@
     <q-card class="q-dialog-plugin">
       <q-card-section>
         <ag-grid-vue
-          :row-data="rowData"
+          :row-data="rows"
           :column-defs="colDefs"
           :default-col-def="defaultColDef"
           :column-types="columnTypes"
@@ -26,47 +26,37 @@
   </q-dialog>
 </template>
 
-<script setup>
-/* eslint-disable @typescript-eslint/no-unsafe-assignment*/
-/* eslint-disable @typescript-eslint/no-unsafe-argument*/
-/* eslint-disable @typescript-eslint/no-unsafe-member-access*/
+<script setup lang="ts">
 import { useDialogPluginComponent } from 'quasar'
 import 'ag-grid-community/styles/ag-grid.css' // Core CSS
 import 'ag-grid-community/styles/ag-theme-quartz.css' // Theme
 import { AgGridVue } from 'ag-grid-vue3' // Vue Grid Logic
-import { ref } from 'vue'
 import Papa from 'papaparse'
+import { computed } from 'vue'
 
-const props = defineProps({
-  csv: String
-  // ...your custom props
-})
+const props = defineProps<{
+  csv: string
+}>()
 
-// this commit causes the build error
-//const colDef = (fieldName: string) => 5;
-
-/*
 function colDef(fieldName: string) {
-  const def = { field: fieldName }
+  let type = undefined
   if (fieldName == 'Id') {
-    def.type = 'idColumn'
+    type = 'idColumn'
   }
   if (fieldName.includes('(DATE)')) {
-    def.type = 'dateColumn'
+    type = 'dateColumn'
   }
-  return def
+  return {
+    field: fieldName,
+    type
+  }
 }
-*/
-const parseResult = Papa.parse(props.csv, { header: true, delimiter: ';' })
-const rows = parseResult.data
-const keys = Object.keys(rows[0])
-const fields = keys.map((key) => ({ field: key }))
-//console.log(fields)
-const colDefs = ref(fields)
-//const colDefs = ref([{ field: 'make' }, { field: 'model' }, { field: 'price' }, { field: 'electric' }])
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-const rowData = ref(rows)
+const rows = computed(() => Papa.parse(props.csv, { header: true, delimiter: ';' }).data as Array<Array<string>>)
+const colDefs = computed(() => {
+  const keys = Object.keys(rows.value[0])
+  return keys.map((key) => colDef(key))
+})
 
 const defaultColDef = {
   editable: false,
